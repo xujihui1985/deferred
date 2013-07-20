@@ -9,11 +9,9 @@ var deferred = function () {
     // Ends the object by resolving or rejecting
     var end = function (type, param) {
         if (isClosed()) {
-            return public;
+            return;
         }
-
         type === "done" ? resolved = param : rejected = param;
-
         callCallbacks(callbacks[type], param);
     };
 
