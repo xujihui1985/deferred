@@ -124,4 +124,22 @@ describe("The deferred object", function () {
         expect(calls.done).not.toHaveBeenCalled();
         expect(calls.fail.calls.length).toBe(2);
     });
+
+    it("Should tell me if it has been resolved", function() {
+        var d = deferred();
+
+        d.resolve("solved");
+
+        expect(d.isResolved()).toBe(true);
+        expect(d.isRejected()).toBe(false);
+    });
+
+    it("Should tell me if it has been rejected", function() {
+        var d = deferred();
+
+        d.reject("fail");
+
+        expect(d.isRejected()).toBe(true);
+        expect(d.isResolved()).toBe(false);
+    });
 });
