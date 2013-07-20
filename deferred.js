@@ -6,7 +6,7 @@ var deferred = function () {
         public = {},
         resolved, rejected;
 
-    // Ends the pbject by resolving or rejecting
+    // Ends the object by resolving or rejecting
     var end = function (type, param) {
         if (isClosed()) {
             return public;
@@ -52,11 +52,11 @@ var deferred = function () {
     };
 
     public.isResolved = function () {
-        return resolved;
+        return resolved !== undefined;
     };
 
     public.isRejected = function () {
-        return rejected;
+        return rejected !== undefined;
     };
 
     public.done = function () {
