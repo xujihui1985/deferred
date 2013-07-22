@@ -12,10 +12,10 @@ var deferred = function () {
             return;
         }
         type === "done" ? resolved = param : rejected = param;
-        callCallbacks(callbacks[type], param);
+        invokeCallbacks(callbacks[type], param);
     };
 
-    var callCallbacks = function (callbacks, param) {
+    var invokeCallbacks = function (callbacks, param) {
         callbacks.forEach(function (callback) {
             if (callback instanceof Function) {
                 callback.apply(undefined, param);
@@ -33,7 +33,7 @@ var deferred = function () {
                 callbacks.push(el);
             });
         } else if (test) {
-            callCallbacks(newCallbacks, params);
+            invokeCallbacks(newCallbacks, params);
         }
     };
 
