@@ -36,9 +36,7 @@ describe("The deferred object", function () {
         spyOn(calls, "done");
         spyOn(calls, "fail");
 
-        d.done(calls.done);
-
-        d.fail(calls.fail);
+        d.done(calls.done).fail(calls.fail);
 
         d.resolve("Resolved");
 
@@ -61,9 +59,7 @@ describe("The deferred object", function () {
         spyOn(calls, "done");
         spyOn(calls, "fail");
 
-        d.done(calls.done);
-
-        d.fail(calls.fail);
+        d.done(calls.done).fail(calls.fail);
 
         d.resolve("Resolved");
 
@@ -88,9 +84,7 @@ describe("The deferred object", function () {
         spyOn(calls, "done");
         spyOn(calls, "fail");
 
-        d.done(calls.done);
-
-        d.fail(calls.fail);
+        d.done(calls.done).fail(calls.fail);
 
         d.reject("Rejected");
 
@@ -113,9 +107,7 @@ describe("The deferred object", function () {
         spyOn(calls, "done");
         spyOn(calls, "fail");
 
-        d.done(calls.done);
-
-        d.fail(calls.fail);
+        d.done(calls.done).fail(calls.fail);
 
         d.reject("Rejected");
 
