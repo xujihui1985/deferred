@@ -1,0 +1,32 @@
+{
+  "name": "deferred",
+  "version": "0.0.0",
+  "description": "An implementation of the Deferred object",
+  "main": "Gruntfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-jshint": "~0.9.1",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-watch": "~0.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ricca509/deferred.git"
+  },
+  "keywords": [
+    "deferred",
+    "promise"
+  ],
+  "author": "Riccardo Coppola <ricca509@gmail.com>",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/ricca509/deferred/issues"
+  }
+}
