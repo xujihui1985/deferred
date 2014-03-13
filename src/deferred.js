@@ -1,9 +1,23 @@
-var deferred = function () {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory;
+    } else {
+        // Browser globals (root is window)
+        root.deferred = factory;
+    }
+}(this, function () {
+    'use strict';
     var callbacks = {
             done: [],
             fail: []
         },
-        public = {
+        publicInterface = {
             promise: {}
         },
         resolved, rejected;
@@ -46,52 +60,52 @@ var deferred = function () {
     };
 
     // Resolves the deferred object
-    public.resolve = function () {
+    publicInterface.resolve = function () {
         end("done", Array.prototype.slice.apply(arguments));
 
-        return public;
+        return publicInterface;
     };
 
     // Resolves the deferred object
-    public.reject = function (param) {
+    publicInterface.reject = function (param) {
         end("fail", Array.prototype.slice.apply(arguments));
 
-        return public;
+        return publicInterface;
     };
 
-    public.promise.isResolved = function () {
+    publicInterface.promise.isResolved = function () {
         return resolved !== undefined;
     };
 
-    public.promise.isRejected = function () {
+    publicInterface.promise.isRejected = function () {
         return rejected !== undefined;
     };
 
-    public.promise.done = function () {
+    publicInterface.promise.done = function () {
         var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.done, calls, resolved, public.promise.isResolved());
+        attach(callbacks.done, calls, resolved, publicInterface.promise.isResolved());
 
-        return public.promise;
+        return publicInterface.promise;
     };
 
-    public.promise.fail = function () {
+    publicInterface.promise.fail = function () {
         var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.fail, calls, rejected, public.promise.isRejected());
+        attach(callbacks.fail, calls, rejected, publicInterface.promise.isRejected());
 
-        return public.promise;
+        return publicInterface.promise;
     };
 
-    public.promise.then = function(onFulfilled, onRejected) {
+    publicInterface.promise.then = function(onFulfilled, onRejected) {
         if (onFulfilled instanceof Function) {
-            public.done(onFulfilled);
+            publicInterface.promise.done(onFulfilled);
         }
         if (onRejected instanceof Function) {
-            public.fail(onRejected);
+            publicInterface.promise.fail(onRejected);
         }
-        return public.promise;
+        return publicInterface.promise;
     };
 
-
     // Return only the public properties
-    return public;
-};
+    return publicInterface;
+}));
+

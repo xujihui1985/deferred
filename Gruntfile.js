@@ -2,6 +2,28 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        jasmine: {
+            src: 'src/deferred.js',
+            options: {
+                specs: 'tests/spec/*Spec.js',
+                vendor: [
+                ],
+                host : 'http://127.0.0.1:3000/'
+            }
+        },
+        connect: {
+            test: {
+                options: {
+                    port: 3000
+                }
+            },
+            forever: {
+                options: {
+                    port: 3000,
+                    keepalive: true
+                }
+            }
+        },
         uglify: {
             options: {
 
@@ -24,7 +46,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-jasmine');
+    grunt.loadNpmTasks('grunt-contrib-connect');
 
     grunt.registerTask('default', ['jshint', 'uglify']);
-
+    grunt.registerTask('test', ['connect:test', 'jasmine']);
 };
