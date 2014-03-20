@@ -4,8 +4,8 @@ describe("The deferred object", function () {
 
         expect(d.promise.done).toBeDefined();
         expect(d.promise.fail).toBeDefined();
-        expect(d.promise.isRejected).toBeDefined();
-        expect(d.promise.isResolved).toBeDefined();
+        //expect(d.promise.isRejected).toBeDefined();
+        //expect(d.promise.isResolved).toBeDefined();
         expect(d.reject).toBeDefined();
         expect(d.resolve).toBeDefined();
         expect(d.promise).toBeDefined();
@@ -16,8 +16,8 @@ describe("The deferred object", function () {
 
         expect(p.done).toBeDefined();
         expect(p.fail).toBeDefined();
-        expect(p.isRejected).toBeDefined();
-        expect(p.isResolved).toBeDefined();
+        //expect(p.isRejected).toBeDefined();
+        //expect(p.isResolved).toBeDefined();
         expect(p.resolve).not.toBeDefined();
     });
 
@@ -120,24 +120,24 @@ describe("The deferred object", function () {
         expect(calls.done).not.toHaveBeenCalled();
         expect(calls.fail.calls.length).toBe(2);
     });
-
-    it("Should tell me if it has been resolved", function() {
-        var d = deferred();
-        var promise = d.promise;
-
-        d.resolve("solved");
-
-        expect(promise.isResolved()).toBe(true);
-        expect(promise.isRejected()).toBe(false);
-    });
-
-    it("Should tell me if it has been rejected", function() {
-        var d = deferred();
-        var promise = d.promise;
-
-        d.reject("fail");
-
-        expect(promise.isRejected()).toBe(true);
-        expect(promise.isResolved()).toBe(false);
-    });
+//
+//    it("Should tell me if it has been resolved", function() {
+//        var d = deferred();
+//        var promise = d.promise;
+//
+//        d.resolve("solved");
+//
+//        expect(promise.isResolved()).toBe(true);
+//        expect(promise.isRejected()).toBe(false);
+//    });
+//
+//    it("Should tell me if it has been rejected", function() {
+//        var d = deferred();
+//        var promise = d.promise;
+//
+//        d.reject("fail");
+//
+//        expect(promise.isRejected()).toBe(true);
+//        expect(promise.isResolved()).toBe(false);
+//    });
 });

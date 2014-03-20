@@ -13,99 +13,118 @@
     }
 }(this, function () {
     'use strict';
-    var callbacks = {
-            done: [],
-            fail: []
+        var Status = {
+            PENDING: 0,
+            RESOLVED: 'done',
+            REJECTED: 'fail'
         },
-        publicInterface = {
-            promise: {}
-        },
-        resolved, rejected;
+        module = {
+            callbacks: {
+                done: [],
+                fail: []
+            },
+            currentStatus: Status.PENDING,
+            reason: null,
+            publicInterface: {
+                promise: {}
+            }
+        };
 
-    // Ends the object by resolving or rejecting
-    var end = function (type, param) {
-        if (isClosed()) {
+    // The Promise Resolution Procedure
+    module.end = function (toStatus, x) {
+        if (!module.isPending()) {
             return;
         }
-        if (type === "done") {
-            resolved = param;
-        } else {
-            rejected = param;
+
+        if (module.publicInterface.promise === x) {
+            module.currentStatus = Status.REJECTED;
+            module.reason = 'TypeError';
         }
-        invokeCallbacks(callbacks[type], param);
+
+        // TODO Fix this check to see if "x" is a promise
+        if (x && (x.then instanceof Function)) {
+            module.publicInterface.promise = x;
+        }
+
+        //if (!(x instanceof Function) && !(x instanceof Object)) {
+            module.currentStatus = toStatus;
+            module.reason = x;
+        //}
+
+        module.invokeCallbacks(module.callbacks[module.currentStatus]);
     };
 
-    var invokeCallbacks = function (callbacks, param) {
-        callbacks.forEach(function (callback) {
-            if (callback instanceof Function) {
-                callback(param);
-            }
-        });
+    module.invokeCallbacks = function (callbacks) {
+        setTimeout(function (callbackList) {
+            callbackList.forEach(function (callback) {
+                if (callback instanceof Function) {
+                    callback(this.reason);
+                }
+            }.bind(this));
+        }.bind(module, callbacks), 5);
     };
 
-    var isClosed = function () {
-        return (resolved || rejected) ? true : false;
+    module.isPending = function () {
+        return module.currentStatus === Status.PENDING;
     };
 
-    var attach = function (callbacksToAttachTo, newCallbacks, params, test) {
-        if (!isClosed()) {
+    module.attach = function (callbacksToAttachTo, newCallbacks, shouldRunCallbacks) {
+        if (module.isPending()) {
             newCallbacks.forEach(function (callback) {
                 if (callback instanceof Function) {
                     callbacksToAttachTo.push(callback);
                 }
             });
-        } else if (test) {
-            invokeCallbacks(newCallbacks, params);
+        } else if (shouldRunCallbacks) {
+            module.invokeCallbacks(newCallbacks);
         }
     };
 
     // Resolves the deferred object
-    publicInterface.resolve = function () {
-        end("done", Array.prototype.slice.apply(arguments));
+    module.publicInterface.resolve = function (value) {
+        module.end(Status.RESOLVED, value);
 
-        return publicInterface;
+        return module.publicInterface;
     };
 
     // Resolves the deferred object
-    publicInterface.reject = function (param) {
-        end("fail", Array.prototype.slice.apply(arguments));
+    module.publicInterface.reject = function (reason) {
+        module.end(Status.REJECTED, reason);
 
-        return publicInterface;
+        return module.publicInterface;
     };
 
-    publicInterface.promise.isResolved = function () {
-        return resolved !== undefined;
+    /********** PROMISE **********/
+
+    module.publicInterface.promise.getStatus = function () {
+        return module.currentStatus;
     };
 
-    publicInterface.promise.isRejected = function () {
-        return rejected !== undefined;
+    module.publicInterface.promise.done = function () {
+        var newCallbacks = Array.prototype.slice.apply(arguments);
+        module.attach(module.callbacks.done, newCallbacks, module.currentStatus === Status.RESOLVED);
+
+        return module.publicInterface.promise;
     };
 
-    publicInterface.promise.done = function () {
-        var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.done, calls, resolved, publicInterface.promise.isResolved());
+    module.publicInterface.promise.fail = function () {
+        var newCallbacks = Array.prototype.slice.apply(arguments);
+        module.attach(module.callbacks.fail, newCallbacks, module.currentStatus === Status.REJECTED);
 
-        return publicInterface.promise;
+        return module.publicInterface.promise;
     };
 
-    publicInterface.promise.fail = function () {
-        var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.fail, calls, rejected, publicInterface.promise.isRejected());
-
-        return publicInterface.promise;
-    };
-
-    publicInterface.promise.then = function(onFulfilled, onRejected) {
+    module.publicInterface.promise.then = function(onFulfilled, onRejected) {
         if (onFulfilled instanceof Function) {
-            publicInterface.promise.done(onFulfilled);
+            module.publicInterface.promise.done(onFulfilled);
         }
         if (onRejected instanceof Function) {
-            publicInterface.promise.fail(onRejected);
+            module.publicInterface.promise.fail(onRejected);
         }
-        return publicInterface.promise;
+        return module.publicInterface.promise;
     };
 
     // Return only the public properties
-    return publicInterface;
+    return module.publicInterface;
 }));
 

@@ -13,12 +13,12 @@
     "grunt-contrib-watch": "~0.6.0"
   },
   "devDependencies": {
-    "promises-aplus-tests": "~2.0.4",
+      "promises-aplus-tests": "*",
       "grunt-contrib-jasmine": "~0.5.2",
       "grunt-contrib-connect": "~0.6.0"
   },
   "scripts": {
-    "test-compliance": "promises-aplus-tests tests/complianceTestSuiteAdapter.js",
+    "test-compliance": "promises-aplus-tests tests/complianceTestSuiteAdapter.js --reporter spec",
     "test": "grunt test"
   },
   "repository": {
