@@ -13,99 +13,95 @@
     }
 }(this, function () {
     'use strict';
-    var callbacks = {
-            done: [],
-            fail: []
-        },
-        publicInterface = {
-            promise: {}
-        },
-        resolved, rejected;
 
-    // Ends the object by resolving or rejecting
-    var end = function (type, param) {
-        if (isClosed()) {
-            return;
-        }
-        if (type === "done") {
-            resolved = param;
-        } else {
-            rejected = param;
-        }
-        invokeCallbacks(callbacks[type], param);
-    };
-
-    var invokeCallbacks = function (callbacks, param) {
-        callbacks.forEach(function (callback) {
-            if (callback instanceof Function) {
-                callback(param);
+    function attach (callbacksToAttachTo, newCallbacks) {
+        newCallbacks.forEach(function (callback) {
+            if (typeof callback === 'function') {
+                callbacksToAttachTo.push(callback);
             }
         });
-    };
+    }
 
-    var isClosed = function () {
-        return (resolved || rejected) ? true : false;
-    };
+    function Promise() {
+        this.resolved = undefined;
+        this.rejected = undefined;
+        this.callbacks = {
+            done:[],
+            fail:[]
+        };
+    }
 
-    var attach = function (callbacksToAttachTo, newCallbacks, params, test) {
-        if (!isClosed()) {
-            newCallbacks.forEach(function (callback) {
-                if (callback instanceof Function) {
-                    callbacksToAttachTo.push(callback);
+    Promise.prototype = {
+        constructor:Promise,
+        isClosed: function(){
+            return (this.resolved || this.rejected) ? true : false;
+        },
+        isResolved: function () {
+            return this.resolved !== undefined;
+        },
+        isRejected: function () {
+            return this.rejected !== undefined;
+        },
+        _invokeCallbacks: function (callbacks, param) {
+            callbacks.forEach(function (callback) {
+                if (typeof callback === 'function') {
+                    callback(param);
                 }
             });
-        } else if (test) {
-            invokeCallbacks(newCallbacks, params);
-        }
-    };
+        },
+        done: function () {
+            var calls = Array.prototype.slice.call(arguments);
+            if(!this.isClosed()) {
+                attach(this.callbacks.done, calls, this.resolved);
+            } else {
+                this._invokeCallbacks(calls,this.resolved);
+            }
+            return this;
+        },
+        fail: function () {
+            var calls = Array.prototype.slice.call(arguments);
+            if(!this.isClosed()) {
+                attach(this.callbacks.fail, calls, this.rejected);
+            } else {
+                this._invokeCallbacks(calls,this.rejected);
+            }
+            return this;
+        },
+        then: function(onFulfilled, onRejected) {
+            if (typeof onFulfilled === 'function') {
+                this.done(onFulfilled);
+            }
+            if (typeof onRejected === 'function') {
+                this.fail(onRejected);
+            }
+            return this;
+        },
+        end: function(type, param){
+            if (this.isClosed()) { return; }
+            if (type === "done") {
+                this.resolved = param;
+            } else {
+                this.rejected = param;
+            }
+            this._invokeCallbacks(this.callbacks[type], param);
+            this.callbacks = null;
+        },
+    }
 
-    // Resolves the deferred object
-    publicInterface.resolve = function () {
-        end("done", Array.prototype.slice.apply(arguments));
-
-        return publicInterface;
-    };
-
-    // Resolves the deferred object
-    publicInterface.reject = function (param) {
-        end("fail", Array.prototype.slice.apply(arguments));
-
-        return publicInterface;
-    };
-
-    publicInterface.promise.isResolved = function () {
-        return resolved !== undefined;
-    };
-
-    publicInterface.promise.isRejected = function () {
-        return rejected !== undefined;
-    };
-
-    publicInterface.promise.done = function () {
-        var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.done, calls, resolved, publicInterface.promise.isResolved());
-
-        return publicInterface.promise;
-    };
-
-    publicInterface.promise.fail = function () {
-        var calls = Array.prototype.slice.apply(arguments);
-        attach(callbacks.fail, calls, rejected, publicInterface.promise.isRejected());
-
-        return publicInterface.promise;
-    };
-
-    publicInterface.promise.then = function(onFulfilled, onRejected) {
-        if (onFulfilled instanceof Function) {
-            publicInterface.promise.done(onFulfilled);
-        }
-        if (onRejected instanceof Function) {
-            publicInterface.promise.fail(onRejected);
-        }
-        return publicInterface.promise;
+    function Deferred(){
+        this.promise = new Promise();
+    }
+    Deferred.prototype = {
+        constructor: Deferred,
+        resolve:  function () {
+            this.promise.end("done", Array.prototype.slice.call(arguments));
+        },
+        reject: function (param) {
+            this.promise.end("fail", Array.prototype.slice.call(arguments));
+        },
     };
 
     // Return only the public properties
-    return publicInterface;
+    return new Deferred();
 }));
 

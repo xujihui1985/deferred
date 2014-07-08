@@ -13,9 +13,10 @@ git clone --depth=1 https://github.com/ricca509/deferred.git
 **Using it**
 
 ```javascript
-var d = deferred();
+var d = deferred(),
+    promise = d.promise;
 
-d.done(function (param) {
+promise.done(function (param) {
    console.log("done " + param);
 }).fail(function (param) {
     console.log("failed " + param);
@@ -23,7 +24,7 @@ d.done(function (param) {
 
 d.resolve("Resolved");  // Logs: "done Resolved"
 
-d.done(function (param) {
+promise.done(function (param) {
    console.log("After " + param);
 }); // Logs: "After Resolved"
 
