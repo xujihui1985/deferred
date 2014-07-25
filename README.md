@@ -30,4 +30,13 @@ promise.done(function (param) {
 
 ```
 
+**Improving it**
+
+If you want to improve/fix the library, make sure to write appropriate tests
+and always run
+```
+grunt
+```
+to make sure that the code is correctly written and the tests are passing.  
+
 If you have any questions or feedback, feel free to contact me using [@CoppolaRiccardo](https://twitter.com/CoppolaRiccardo) on Twitter.
