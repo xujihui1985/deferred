@@ -14,33 +14,37 @@
 }(this, function () {
     'use strict';
 
-    function attach (callbacksToAttachTo, newCallbacks) {
+    var OUTCOME = {
+        done: 'done',
+        fail: 'fail'
+    },
+    attach = function (callbacksToAttachTo, newCallbacks) {
         newCallbacks.forEach(function (callback) {
             if (typeof callback === 'function') {
                 callbacksToAttachTo.push(callback);
             }
         });
-    }
+    }, Promise, Deferred;
 
-    function Promise() {
-        this.resolved = undefined;
-        this.rejected = undefined;
+    Promise = function () {
+        this.resolved = null;
+        this.rejected = null;
         this.callbacks = {
             done:[],
             fail:[]
         };
-    }
+    };
 
     Promise.prototype = {
-        constructor:Promise,
-        isClosed: function(){
+        constructor: Promise,
+        isClosed: function (){
             return (this.resolved || this.rejected) ? true : false;
         },
         isResolved: function () {
-            return this.resolved !== undefined;
+            return this.resolved !== null;
         },
         isRejected: function () {
-            return this.rejected !== undefined;
+            return this.rejected !== null;
         },
         _invokeCallbacks: function (callbacks, param) {
             callbacks.forEach(function (callback) {
@@ -67,7 +71,7 @@
             }
             return this;
         },
-        then: function(onFulfilled, onRejected) {
+        then: function (onFulfilled, onRejected) {
             if (typeof onFulfilled === 'function') {
                 this.done(onFulfilled);
             }
@@ -76,9 +80,9 @@
             }
             return this;
         },
-        end: function(type, param){
+        end: function (type, param){
             if (this.isClosed()) { return; }
-            if (type === "done") {
+            if (type === OUTCOME.done) {
                 this.resolved = param;
             } else {
                 this.rejected = param;
@@ -86,22 +90,21 @@
             this._invokeCallbacks(this.callbacks[type], param);
             this.callbacks = null;
         },
-    }
+    };
 
-    function Deferred(){
+    Deferred = function () {
         this.promise = new Promise();
-    }
+    };
+
     Deferred.prototype = {
         constructor: Deferred,
         resolve:  function () {
-            this.promise.end("done", Array.prototype.slice.call(arguments));
+            this.promise.end(OUTCOME.done, Array.prototype.slice.call(arguments));
         },
-        reject: function (param) {
-            this.promise.end("fail", Array.prototype.slice.call(arguments));
+        reject: function () {
+            this.promise.end(OUTCOME.fail, Array.prototype.slice.call(arguments));
         },
     };
 
-    // Return only the public properties
     return new Deferred();
 }));
-
