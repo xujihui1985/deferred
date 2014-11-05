@@ -1,3 +1,4 @@
+[ ![Codeship Status for xujihui1985/deferred](https://www.codeship.io/projects/52b9d7f0-46c6-0132-b0e4-6242a77a8d98/status)](https://www.codeship.io/projects/45404)
 #Deferred
 
 **What**
